@@ -23,12 +23,12 @@
                                     {{candidat.prenom}}
                                 </div>
                                 <img
-                                        :src="candidat.image"
+                                        :src="candidat.img"
                                         class="card-img"
                                 >
                                 <div class="card-body">
                                     <blockquote class="blockquote mb-0">
-                                        {{candidat.citation}}
+                                        {{candidat.description}}
                                     </blockquote>
                                 </div>
                                 <div class="card-footer text-muted">
