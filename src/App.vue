@@ -37,6 +37,9 @@
     },
     methods:
             {
+              /**
+               *
+               */
               async getListVote() {
                 const uri = 'http://localhost:8000/api/votes';
                 const header = {
@@ -58,6 +61,11 @@
                         .catch(e => { console.log(e); });
 
                 return data;
+              },
+
+              async getUser()
+              {
+
               },
 
               /**
