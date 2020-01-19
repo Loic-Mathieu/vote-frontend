@@ -54,18 +54,43 @@
     export default {
         name: "pageVote",
         props: {
-            candidats: Array
+            user : Object
         },
 
         data ()
         {
             return {
-                choix : []
+                choix : [],
+                candidats : Array
             }
+        },
+
+        mounted() {
+            this.getCandidats()
         },
 
         methods:
         {
+            async getCandidats()
+            {
+                const uri = 'http://127.0.0.1:8000/api/candidats';
+                const header = {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer '.concat(this.user.token)
+                };
+
+                await this.$http
+                    .get(uri, {
+                        headers: header,
+                        crossorigin:true,
+                        crossdomain:true,
+                    })
+                    .then(response => {this.candidats = response.data.results})
+                    // eslint-disable-next-line no-console
+                    .catch(e => console.log(e))
+            },
+
             /**
              *
              * @param event

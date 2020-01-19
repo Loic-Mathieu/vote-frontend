@@ -8,7 +8,7 @@
                 <div class="card-body">
                     <form @submit.prevent="chekCredentials" class="connexion-form">
                         <div class="form-group row">
-                            <label for="matricule" class="col-3">Identifiant</label>
+                            <label for="login" class="col-3">Identifiant</label>
                             <input
                                 name="iLogin"
                                 v-model="login"
@@ -73,7 +73,7 @@
                         }
                     )
                     // eslint-disable-next-line no-console
-                    .then(response => {this.user.token = response.data.access; console.log("REQUEST DATA", response.data)})
+                    .then(response => {this.user.token = response.data.access;})
                     // eslint-disable-next-line no-console
                     .catch(e => console.log(e))
             },
@@ -117,18 +117,8 @@
                     // récupérer les infos de l'utilisateur
                     await this.getUser(this.login);
 
-                    // vérifier si il peut voter
-                    if(this.user != null && !this.user.info.a_vote)
-                    {
-                        // eslint-disable-next-line no-console
-                        console.log("RESULTAT", this.user.info.username, this.user.info.a_vote, this.user.info.id);
-
-                        // this.$emit('valid:username', this.user);
-                    }
-                }
-                else
-                {
-                    // TODO error message
+                    // renvoyer l'utilisateur
+                    this.$emit('valid:user', this.user);
                 }
             },
         }

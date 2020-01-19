@@ -3,14 +3,23 @@
 
     <page-connexion
             v-if="user == null"
-            @valid:username="validerConnexion"
+            @valid:user="validerConnexion"
     />
     <page-vote
-            v-else
-            v-bind:candidats="candidats"
+            v-else-if="user.info.a_vote === false"
+            v-bind:user="user"
             @send:choix="sendChoix"
             class="container"
     />
+
+    <div
+          v-else
+          class="container"
+    >
+          <p>
+            Vous avez déjà voté
+          </p>
+    </div>
 
   </div>
 </template>
@@ -29,11 +38,7 @@
     {
       return{
         user:null,
-        candidats:null,
       }
-    },
-    mounted() {
-      this.getAllCandidats()
     },
     methods:
             {
@@ -45,6 +50,7 @@
                 const header = {
                   Accept: 'application/json',
                   'Content-Type': 'application/json',
+                  Authorization: 'Bearer '.concat(this.user.token)
                 };
 
                 // init a null
@@ -63,9 +69,34 @@
                 return data;
               },
 
-              async getUser()
+              /**
+               *
+               */
+              async updateCurrentUser()
               {
-                    // some comment
+                const uri = 'http://localhost:8000/api/utilisateurs/'.concat(this.user.info.id, '/');
+                const header = {
+                  Accept: 'application/json',
+                  'Content-Type': 'application/json',
+                  Authorization: 'Bearer '.concat(this.user.token)
+                };
+
+                // patch sur le server
+                this.$http
+                        .patch(uri,
+                            {
+                                    'a_vote': true
+                                  },
+                            {
+                                    headers: header,
+                                    crossorigin: true,
+                                    crossdomain: true,
+                                  })
+                        // eslint-disable-next-line no-console
+                        .catch(e => { console.log(e); });
+
+                // update en local
+                this.user.info.a_vote = true;
               },
 
               /**
@@ -75,7 +106,7 @@
               async sendChoix(choix) {
 
                 // On attend les votes actuels
-                var oldVotes = await this.getListVote();
+                let oldVotes = await this.getListVote();
 
                 // Pour chaque vote à passer
                 choix.forEach(element => {
@@ -84,20 +115,24 @@
                   let vote = oldVotes.find(el => {return el.candidat === parseInt(element);} );
 
                   // On va voter pour le candidat
-                  this.postOneChoix(vote)
+                  this.postOneChoix(vote);
+
+                  // On indique que l'utilisateur à voté
+                  this.updateCurrentUser();
                 });
               },
 
+              /**
+               * @param oldVote
+               */
               postOneChoix(oldVote)
               {
                 const uri = "http://127.0.0.1:8000/api/votes/".concat(oldVote.id, '/');
                 const header = {
                   Accept: 'application/json',
                   'Content-Type': 'application/json',
+                  Authorization: 'Bearer '.concat(this.user.token)
                 };
-
-                // eslint-disable-next-line no-console
-                console.log("Url utilisée", uri);
 
                 this.$http
                         .patch(uri,
@@ -117,34 +152,12 @@
 
               /**
                *
-               * @param username matricule
+               * @param user
                */
-              validerConnexion(username)
+              validerConnexion(user)
               {
-                // eslint-disable-next-line no-console
-                console.log(username);
-
-                this.user = username;
+                this.user = user;
               },
-
-              getAllCandidats()
-              {
-                const uri = 'http://127.0.0.1:8000/api/candidats';
-                const header = {
-                  Accept: 'application/json',
-                  'Content-Type': 'application/json',
-                };
-
-                this.$http
-                        .get(uri, {
-                          headers: header,
-                          crossorigin:true,
-                          crossdomain:true,
-                        })
-                        .then(response => {this.candidats = response.data.results})
-                        // eslint-disable-next-line no-console
-                        .catch(e => console.log(e))
-              }
             }
   }
 </script>
