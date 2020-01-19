@@ -102,7 +102,7 @@
 
                 // ajouter ou retirer
                 if(this.choix.includes(targetId))
-                    this.removeOneVote(targetId)
+                    this.removeOneVote(targetId);
                 else
                     this.addOneVote(targetId);
             },
